@@ -1,0 +1,96 @@
+.home-container {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    color: #333;
+  }
+  
+  /* Hero Section */
+  .hero {
+    background: url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e") 
+                no-repeat center center/cover;
+    color: white;
+    padding: 100px 20px;
+  }
+  
+  .hero-title {
+    font-size: 3rem;
+    margin-bottom: 10px;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .hero-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .book-btn,
+  .register-btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+  
+  /* Book Now button */
+  .book-btn {
+    background-color: #0d47a1;
+    color: white;
+  }
+  
+  .book-btn:hover {
+    background-color: #094080;
+    transform: scale(1.05);
+  }
+  
+  /* Registration button */
+  .register-btn {
+    background-color: #ff9800;
+    color: white;
+  }
+  
+  .register-btn:hover {
+    background-color: #e68900;
+    transform: scale(1.05);
+  }
+  /* About Section */
+  .about {
+    padding: 40px 20px;
+    background: #f4f4f4;
+  }
+  
+  .about h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+  }
+  
+  /* Features Section */
+  .features {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding: 40px 20px;
+  }
+  
+  .feature-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    width: 250px;
+    margin: 10px;
+    box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+  }
+  
+  .feature-card:hover {
+    transform: scale(1.05);
+  }
+  
