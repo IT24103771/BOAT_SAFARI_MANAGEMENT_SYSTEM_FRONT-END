@@ -18,17 +18,11 @@ function Home() {
       .catch((err) => console.error("Error fetching feedbacks:", err));
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("user");
-    setIsLoggedIn(false);
-  };
-
   return (
     <div className="home-container">
       {/* Hero Section */}
       <header className="hero">
-        <h1 className="hero-title">Welcome to ALOKA AKA DEKU Safari 🚤</h1>
+        <h1 className="hero-title">Welcome to SLIIT Safari 🚤</h1>
         <p className="hero-subtitle">Explore the beauty of nature on water</p>
         <div className="hero-buttons">
           <button className="book-btn" onClick={() => navigate("/booktrip")}>
@@ -39,11 +33,6 @@ function Home() {
               Login
             </button>
           )}
-          {isLoggedIn && (
-            <button className="logout-btn" onClick={handleLogout}>
-              Logout
-            </button>
-          )}
         </div>
       </header>
 
@@ -51,9 +40,9 @@ function Home() {
       <section className="about">
         <h2>Why Choose Us?</h2>
         <p>
-          Experience breathtaking boat safaris with professional guides,
-          safe boats, and unforgettable views. Perfect for families, friends,
-          and adventurers!
+          Experience breathtaking boat safaris with professional guides, safe
+          boats, and unforgettable views. Perfect for families, friends, and
+          adventurers!
         </p>
       </section>
 

@@ -34,7 +34,10 @@ function Login({ setIsLoggedIn }) {
     // 🔹 Hardcoded admin login
     if (formData.email === "admin@gmail.com" && formData.password === "admin") {
       localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("user", JSON.stringify({ email: "admin", role: "ADMIN" }));
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ email: "admin", role: "ADMIN" })
+      );
       setIsLoggedIn(true);
       navigate("/admin"); // ✅ Go directly to Admin.jsx
       return;
@@ -95,10 +98,7 @@ function Login({ setIsLoggedIn }) {
           <button type="submit">Login</button>
         </form>
         <p className="register-text">Don’t have an account?</p>
-        <button
-          className="register-btn"
-          onClick={() => navigate("/register")}
-        >
+        <button className="register-btn" onClick={() => navigate("/register")}>
           Register Here
         </button>
       </div>

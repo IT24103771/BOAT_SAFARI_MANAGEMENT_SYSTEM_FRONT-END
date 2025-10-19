@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 import "../Styles/AdminPanel.css";
 
 const AdminPanel = () => {
@@ -7,8 +9,8 @@ const AdminPanel = () => {
   const [users, setUsers] = useState([]);
   const [boats, setBoats] = useState([]);
   const [trips, setTrips] = useState([]);
-
   const [activeTab, setActiveTab] = useState("bookings");
+  const navigate = useNavigate();
 
   // --- Booking Form ---
   const [bookingForm, setBookingForm] = useState({
@@ -20,7 +22,7 @@ const AdminPanel = () => {
     children: "",
     totalPrice: "",
     boatId: "",
-    tripId: ""
+    tripId: "",
   });
 
   // --- Boat Form ---
@@ -29,7 +31,7 @@ const AdminPanel = () => {
     name: "",
     capacity: "",
     price: "",
-    boatType: "Luxury"
+    boatType: "Luxury",
   });
   const boatTypes = ["Luxury", "Standard", "Fishing", "Speed"];
 
@@ -42,7 +44,7 @@ const AdminPanel = () => {
     childPrice: "",
     description: "",
     startingTime: "",
-    duration: ""
+    duration: "",
   });
 
   // --- Fetch Data ---
@@ -70,22 +72,46 @@ const AdminPanel = () => {
     fetchTrips();
   }, []);
 
+  // --- Booking Validation ---
+  const validateBooking = (b) => {
+    if (!b.name || b.name.trim().length < 3)
+      return "Name must be at least 3 characters.";
+    if (!b.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(b.email))
+      return "Invalid email address.";
+    if (!b.safariDate) return "Safari Date is required.";
+    if (!b.adults || isNaN(b.adults) || parseInt(b.adults) < 1)
+      return "At least 1 adult is required.";
+    if (isNaN(b.children) || parseInt(b.children) < 0)
+      return "Children must be 0 or more.";
+    if (!b.totalPrice || isNaN(b.totalPrice) || parseFloat(b.totalPrice) < 1)
+      return "Total Price must be greater than 0.";
+    if (!b.boatId) return "Please select a Boat.";
+    if (!b.tripId) return "Please select a Trip.";
+    return null;
+  };
+
   // --- Booking Handlers ---
   const handleBookingChange = (e) =>
     setBookingForm({ ...bookingForm, [e.target.name]: e.target.value });
 
   const handleSaveBooking = () => {
+    const error = validateBooking(bookingForm);
+    if (error) return alert(error);
+
     const payload = {
       ...bookingForm,
-      adults: parseInt(bookingForm.adults) || 0,
-      children: parseInt(bookingForm.children) || 0,
-      totalPrice: parseFloat(bookingForm.totalPrice) || 0,
+      adults: parseInt(bookingForm.adults),
+      children: parseInt(bookingForm.children),
+      totalPrice: parseFloat(bookingForm.totalPrice),
       boat: bookingForm.boatId ? { id: bookingForm.boatId } : null,
-      trip: bookingForm.tripId ? { id: bookingForm.tripId } : null
+      trip: bookingForm.tripId ? { id: bookingForm.tripId } : null,
     };
 
     const apiCall = bookingForm.id
-      ? axios.put(`http://localhost:8080/api/bookings/${bookingForm.id}`, payload)
+      ? axios.put(
+          `http://localhost:8080/api/bookings/${bookingForm.id}`,
+          payload
+        )
       : axios.post("http://localhost:8080/api/bookings", payload);
 
     apiCall
@@ -99,7 +125,7 @@ const AdminPanel = () => {
           children: "",
           totalPrice: "",
           boatId: "",
-          tripId: ""
+          tripId: "",
         });
         fetchDashboard();
       })
@@ -116,7 +142,7 @@ const AdminPanel = () => {
       children: booking.children,
       totalPrice: booking.totalPrice,
       boatId: booking.boat?.id || "",
-      tripId: booking.trip?.id || ""
+      tripId: booking.trip?.id || "",
     });
 
   const handleDeleteBooking = (id) =>
@@ -125,16 +151,31 @@ const AdminPanel = () => {
       .then(fetchDashboard)
       .catch(console.error);
 
+  // --- Boat Validation ---
+  const validateBoat = (b) => {
+    if (!b.name || b.name.trim().length < 3)
+      return "Boat name must be at least 3 characters.";
+    if (!b.capacity || isNaN(b.capacity) || parseInt(b.capacity) < 1)
+      return "Capacity must be at least 1.";
+    if (!b.price || isNaN(b.price) || parseFloat(b.price) < 1)
+      return "Price must be greater than 0.";
+    return null;
+  };
+
   // --- Boat Handlers ---
   const handleBoatChange = (e) =>
     setBoatForm({ ...boatForm, [e.target.name]: e.target.value });
 
   const handleSaveBoat = () => {
+    const error = validateBoat(boatForm);
+    if (error) return alert(error);
+
     const payload = {
       ...boatForm,
-      capacity: parseInt(boatForm.capacity) || 0,
-      price: parseFloat(boatForm.price) || 0
+      capacity: parseInt(boatForm.capacity),
+      price: parseFloat(boatForm.price),
     };
+
     const apiCall = boatForm.id
       ? axios.put(`http://localhost:8080/api/boats/${boatForm.id}`, payload)
       : axios.post("http://localhost:8080/api/boats", payload);
@@ -146,7 +187,7 @@ const AdminPanel = () => {
           name: "",
           capacity: "",
           price: "",
-          boatType: "Luxury"
+          boatType: "Luxury",
         });
         fetchDashboard();
       })
@@ -160,19 +201,49 @@ const AdminPanel = () => {
       .then(fetchDashboard)
       .catch(console.error);
 
+  // --- Trip Validation ---
+  const validateTrip = (trip) => {
+    if (!trip.name || trip.name.trim().length < 3)
+      return "Trip name must be at least 3 characters.";
+    if (trip.name.length > 50) return "Trip name cannot exceed 50 characters.";
+    if (
+      !trip.adultPrice ||
+      isNaN(trip.adultPrice) ||
+      parseFloat(trip.adultPrice) <= 1
+    )
+      return "Adult Price must be greater than 1.";
+    if (
+      !trip.childPrice ||
+      isNaN(trip.childPrice) ||
+      parseFloat(trip.childPrice) <= 1
+    )
+      return "Child Price must be greater than 1.";
+    if (!trip.startingTime || !/^\d{2}:\d{2}$/.test(trip.startingTime))
+      return "Starting Time must be in HH:mm format.";
+    if (
+      !trip.duration ||
+      !/^\d+(\.\d+)?\s*(hours?|hrs?|minutes?|mins?)$/i.test(trip.duration)
+    )
+      return "Duration must be valid (e.g., '2 hours', '90 minutes').";
+    if (trip.description && trip.description.length > 250)
+      return "Description cannot exceed 250 characters.";
+    return null;
+  };
+
   // --- Trip Handlers ---
   const handleTripChange = (e) =>
     setTripForm({ ...tripForm, [e.target.name]: e.target.value });
 
   const handleSaveTrip = () => {
-    if (!tripForm.name || !tripForm.adultPrice || !tripForm.startingTime || !tripForm.duration) {
-      return alert("Name, Adult Price, Starting Time, and Duration are required!");
-    }
+    const errorMsg = validateTrip(tripForm);
+    if (errorMsg) return alert(errorMsg);
+
     const payload = {
       ...tripForm,
       adultPrice: parseFloat(tripForm.adultPrice),
-      childPrice: tripForm.childPrice ? parseFloat(tripForm.childPrice) : null
+      childPrice: tripForm.childPrice ? parseFloat(tripForm.childPrice) : null,
     };
+
     const apiCall = tripForm.id
       ? axios.put(`http://localhost:8080/api/trips/${tripForm.id}`, payload)
       : axios.post("http://localhost:8080/api/trips", payload);
@@ -187,7 +258,7 @@ const AdminPanel = () => {
           childPrice: "",
           startingTime: "",
           duration: "",
-          description: ""
+          description: "",
         });
         fetchTrips();
       })
@@ -212,10 +283,29 @@ const AdminPanel = () => {
         ))}
       </div>
 
-      {/* Bookings */}
+      {/* ✅ BOOKINGS */}
       {activeTab === "bookings" && (
         <section>
           <h2>Bookings</h2>
+          {/* --- REPORT BUTTON --- */}
+          <div className="report-action">
+            <button
+              className="generate-report-btn"
+              onClick={() => {
+                axios
+                  .post("http://localhost:8080/api/reports/generate")
+                  .then((res) => {
+                    console.log("Report generated:", res.data);
+                    navigate("/report"); // ✅ now works
+                  })
+                  .catch((err) => console.error(err));
+              }}
+            >
+              Generate Report
+            </button>
+          </div>
+
+          {/* Table */}
           {bookings.length === 0 ? (
             <p>No bookings</p>
           ) : (
@@ -229,8 +319,8 @@ const AdminPanel = () => {
                   <th>Adults</th>
                   <th>Children</th>
                   <th>Total Price</th>
-                  <th>Boat Name</th>
-                  <th>Trip Name</th>
+                  <th>Boat</th>
+                  <th>Trip</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -240,7 +330,7 @@ const AdminPanel = () => {
                     <td>{b.id}</td>
                     <td>{b.name}</td>
                     <td>{b.email}</td>
-                    <td>{b.safariDate || "N/A"}</td>
+                    <td>{b.safariDate}</td>
                     <td>{b.adults}</td>
                     <td>{b.children}</td>
                     <td>{b.totalPrice}</td>
@@ -248,7 +338,9 @@ const AdminPanel = () => {
                     <td>{b.trip?.name || "N/A"}</td>
                     <td>
                       <button onClick={() => handleEditBooking(b)}>Edit</button>
-                      <button onClick={() => handleDeleteBooking(b.id)}>Delete</button>
+                      <button onClick={() => handleDeleteBooking(b.id)}>
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -256,7 +348,7 @@ const AdminPanel = () => {
             </table>
           )}
 
-          {/* Booking Form */}
+          {/* Form */}
           <div className="booking-form">
             <h3>{bookingForm.id ? "Update Booking" : "Add Booking"}</h3>
             <input
@@ -264,28 +356,34 @@ const AdminPanel = () => {
               value={bookingForm.name}
               onChange={handleBookingChange}
               placeholder="Name"
+              required
             />
             <input
               name="email"
               value={bookingForm.email}
               onChange={handleBookingChange}
               placeholder="Email"
+              required
             />
             <input
               type="date"
               name="safariDate"
               value={bookingForm.safariDate}
               onChange={handleBookingChange}
+              required
             />
             <input
               type="number"
+              min="1"
               name="adults"
               value={bookingForm.adults}
               onChange={handleBookingChange}
               placeholder="Adults"
+              required
             />
             <input
               type="number"
+              min="0"
               name="children"
               value={bookingForm.children}
               onChange={handleBookingChange}
@@ -293,15 +391,20 @@ const AdminPanel = () => {
             />
             <input
               type="number"
+              min="1"
               step="0.01"
               name="totalPrice"
               value={bookingForm.totalPrice}
               onChange={handleBookingChange}
               placeholder="Total Price"
+              required
             />
-
-            {/* Boat Dropdown */}
-            <select name="boatId" value={bookingForm.boatId} onChange={handleBookingChange}>
+            <select
+              name="boatId"
+              value={bookingForm.boatId}
+              onChange={handleBookingChange}
+              required
+            >
               <option value="">Select Boat</option>
               {boats.map((b) => (
                 <option key={b.id} value={b.id}>
@@ -309,9 +412,12 @@ const AdminPanel = () => {
                 </option>
               ))}
             </select>
-
-            {/* Trip Dropdown */}
-            <select name="tripId" value={bookingForm.tripId} onChange={handleBookingChange}>
+            <select
+              name="tripId"
+              value={bookingForm.tripId}
+              onChange={handleBookingChange}
+              required
+            >
               <option value="">Select Trip</option>
               {trips.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -319,7 +425,6 @@ const AdminPanel = () => {
                 </option>
               ))}
             </select>
-
             <button onClick={handleSaveBooking}>
               {bookingForm.id ? "Update" : "Add"}
             </button>
@@ -327,7 +432,7 @@ const AdminPanel = () => {
         </section>
       )}
 
-      {/* Users */}
+      {/* ✅ USERS */}
       {activeTab === "users" && (
         <section>
           <h2>Users</h2>
@@ -345,38 +450,49 @@ const AdminPanel = () => {
         </section>
       )}
 
-      {/* Boats */}
+      {/* ✅ BOATS */}
       {activeTab === "boats" && (
         <section>
           <h2>Boats</h2>
           <input
-            placeholder="Name"
             name="name"
             value={boatForm.name}
             onChange={handleBoatChange}
+            placeholder="Name"
+            required
           />
           <input
-            placeholder="Capacity"
-            name="capacity"
             type="number"
+            min="1"
+            name="capacity"
             value={boatForm.capacity}
             onChange={handleBoatChange}
+            placeholder="Capacity"
+            required
           />
           <input
-            placeholder="Price"
-            name="price"
             type="number"
+            min="1"
+            name="price"
             value={boatForm.price}
             onChange={handleBoatChange}
+            placeholder="Price"
+            required
           />
-          <select name="boatType" value={boatForm.boatType} onChange={handleBoatChange}>
+          <select
+            name="boatType"
+            value={boatForm.boatType}
+            onChange={handleBoatChange}
+          >
             {boatTypes.map((t) => (
               <option key={t} value={t}>
                 {t}
               </option>
             ))}
           </select>
-          <button onClick={handleSaveBoat}>{boatForm.id ? "Update" : "Add"}</button>
+          <button onClick={handleSaveBoat}>
+            {boatForm.id ? "Update" : "Add"}
+          </button>
 
           <table className="admin-table">
             <thead>
@@ -397,7 +513,9 @@ const AdminPanel = () => {
                   <td>{b.boatType}</td>
                   <td>
                     <button onClick={() => handleEditBoat(b)}>Edit</button>
-                    <button onClick={() => handleDeleteBoat(b.id)}>Delete</button>
+                    <button onClick={() => handleDeleteBoat(b.id)}>
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -406,7 +524,7 @@ const AdminPanel = () => {
         </section>
       )}
 
-      {/* Trips */}
+      {/* ✅ TRIPS */}
       {activeTab === "trips" && (
         <section>
           <h2>Trips</h2>
@@ -418,7 +536,11 @@ const AdminPanel = () => {
               placeholder="Trip Name"
               required
             />
-            <select name="type" value={tripForm.type} onChange={handleTripChange}>
+            <select
+              name="type"
+              value={tripForm.type}
+              onChange={handleTripChange}
+            >
               {["Shared", "Private", "Cabin"].map((t) => (
                 <option key={t} value={t}>
                   {t}
@@ -427,8 +549,9 @@ const AdminPanel = () => {
             </select>
             <input
               type="number"
-              name="adultPrice"
+              min="2"
               step="0.01"
+              name="adultPrice"
               value={tripForm.adultPrice}
               onChange={handleTripChange}
               placeholder="Adult Price"
@@ -436,11 +559,13 @@ const AdminPanel = () => {
             />
             <input
               type="number"
-              name="childPrice"
+              min="2"
               step="0.01"
+              name="childPrice"
               value={tripForm.childPrice}
               onChange={handleTripChange}
               placeholder="Child Price"
+              required
             />
             <input
               type="time"
@@ -463,7 +588,9 @@ const AdminPanel = () => {
               onChange={handleTripChange}
               placeholder="Description"
             />
-            <button onClick={handleSaveTrip}>{tripForm.id ? "Update" : "Add"}</button>
+            <button onClick={handleSaveTrip}>
+              {tripForm.id ? "Update" : "Add"}
+            </button>
           </div>
 
           <table className="admin-table">
@@ -498,7 +625,9 @@ const AdminPanel = () => {
                     <td>{t.description}</td>
                     <td>
                       <button onClick={() => handleEditTrip(t)}>Edit</button>
-                      <button onClick={() => handleDeleteTrip(t.id)}>Delete</button>
+                      <button onClick={() => handleDeleteTrip(t.id)}>
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))

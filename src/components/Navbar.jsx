@@ -1,18 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import "./Navbar.css";
 
 function Navbar({ isLoggedIn, setIsLoggedIn }) {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-
-  // Load user info from localStorage
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, [isLoggedIn]);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
@@ -26,19 +17,25 @@ function Navbar({ isLoggedIn, setIsLoggedIn }) {
       <h1 className="logo">Boat Safari</h1>
       <div className="nav-links">
         <Link to="/">Home</Link>
-        <Link to="/booktrip">Book Trip</Link>
-        <Link to="/feedback">Feedback</Link>
 
+        {/* Show links only if logged in */}
+        {isLoggedIn && (
+          <>
+            <Link to="/booktrip">Book Trip</Link>
+            <Link to="/feedback">Feedback</Link>
+
+            {/* Show Report link only if user is admin */}
+            {user?.role === "admin" && <Link to="/report">Reports</Link>}
+          </>
+        )}
+
+        {/* Show login if not logged in */}
         {!isLoggedIn ? (
           <Link to="/login">Login</Link>
         ) : (
-          <>
-            {/* Show Admin Panel link if user is admin */}
-            {user?.role === "ADMIN" && <Link to="/admin">Admin Panel</Link>}
-            <button className="logout-btn" onClick={handleLogout}>
-              Logout
-            </button>
-          </>
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
         )}
       </div>
     </nav>

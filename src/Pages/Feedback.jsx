@@ -20,16 +20,56 @@ function Feedback() {
     }));
   };
 
+  const validateForm = () => {
+    // ✅ Name validation
+    if (!/^[A-Za-z\s]{3,50}$/.test(formData.name.trim())) {
+      return "Name must be 3–50 characters (letters only).";
+    }
+
+    // ✅ Email validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      return "Please enter a valid email address.";
+    }
+
+    // ✅ Message validation
+    if (formData.message.trim().length < 10) {
+      return "Feedback must be at least 10 characters long.";
+    }
+    if (formData.message.length > 500) {
+      return "Feedback cannot exceed 500 characters.";
+    }
+
+    // ✅ Rating validation
+    if (formData.rating < 1 || formData.rating > 5) {
+      return "Rating must be between 1 and 5 stars.";
+    }
+
+    return null; // no errors
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      setSuccess("");
+      return;
+    }
+
     try {
-      await axios.post("http://localhost:8080/api/feedbacks", formData); // <-- fixed endpoint
-      setSuccess("Thank you for your feedback!");
+      await axios.post("http://localhost:8080/api/feedbacks", {
+        ...formData,
+        name: formData.name.trim(),
+        message: formData.message.trim(),
+      });
+
+      setSuccess("✅ Thank you for your feedback!");
       setError("");
       setFormData({ name: "", email: "", message: "", rating: 5 });
     } catch (err) {
       console.error(err);
-      setError("Failed to submit feedback. Please try again.");
+      setError("⚠️ Failed to submit feedback. Please try again.");
       setSuccess("");
     }
   };
@@ -79,6 +119,7 @@ function Feedback() {
 
         <button type="submit">Submit Feedback</button>
       </form>
+
       {success && <p className="success">{success}</p>}
       {error && <p className="error">{error}</p>}
     </div>
