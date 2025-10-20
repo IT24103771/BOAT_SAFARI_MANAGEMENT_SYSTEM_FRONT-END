@@ -11,7 +11,6 @@ function Home() {
   useEffect(() => {
     setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
 
-    // Fetch feedbacks from backend
     axios
       .get("http://localhost:8080/api/feedbacks")
       .then((res) => setFeedbacks(res.data))
@@ -20,14 +19,36 @@ function Home() {
 
   return (
     <div className="home-container">
+      {/* Profile button in top right */}
+      {isLoggedIn && (
+        <div className="profile-button" onClick={() => navigate("/usermanagement")}>
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/847/847969.png"
+            alt="User"
+            className="profile-icon"
+          />
+        </div>
+      )}
+
       {/* Hero Section */}
       <header className="hero">
-        <h1 className="hero-title">Welcome to SLIIT Safari 🚤</h1>
+        <h1 className="hero-title">Welcome to ALOKA AKA DEKU Safari 🚤</h1>
         <p className="hero-subtitle">Explore the beauty of nature on water</p>
         <div className="hero-buttons">
-          <button className="book-btn" onClick={() => navigate("/booktrip")}>
-            Book Now
-          </button>
+        <button
+  className="book-btn"
+  onClick={() => {
+    if (isLoggedIn) {
+      navigate("/booktrip");
+    } else {
+      navigate("/login"); // Redirect to login if not logged in
+    }
+  }}
+>
+  Book Now
+</button>
+
+
           {!isLoggedIn && (
             <button className="login-btn" onClick={() => navigate("/login")}>
               Login
@@ -40,9 +61,8 @@ function Home() {
       <section className="about">
         <h2>Why Choose Us?</h2>
         <p>
-          Experience breathtaking boat safaris with professional guides, safe
-          boats, and unforgettable views. Perfect for families, friends, and
-          adventurers!
+          Experience breathtaking boat safaris with professional guides, safe boats, 
+          and unforgettable views. Perfect for families, friends, and adventurers!
         </p>
       </section>
 

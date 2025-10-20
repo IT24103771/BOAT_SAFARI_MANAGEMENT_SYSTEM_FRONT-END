@@ -10,6 +10,8 @@ import Feedback from "./Pages/Feedback";
 import Booktrip from "./Pages/Booktrip"; // ✅ Correct spelling
 import Report from "./Pages/Report"; // ✅ Report page
 import Invoice from "./Pages/Invoice";
+import UserManagement from "./Pages/UserManagement";
+
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
@@ -30,6 +32,8 @@ function App() {
   <Route path="/feedback" element={<Feedback />} />
   <Route path="/report" element={<Report />} />
   <Route path="/invoice/:id" element={<Invoice />} /> {/* ✅ Invoice route */}
+  <Route path="/usermanagement" element={<UserManagement />} />
+
 </Routes>
 
     </BrowserRouter>

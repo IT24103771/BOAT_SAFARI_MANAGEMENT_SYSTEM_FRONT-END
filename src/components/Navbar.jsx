@@ -1,41 +1,39 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "./Navbar.css";
 
-function Navbar({ isLoggedIn, setIsLoggedIn }) {
-  const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+function Navbar({ isLoggedIn }) {
+  const location = useLocation();
+  const [user, setUser] = useState(null);
 
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("user");
-    setIsLoggedIn(false);
-    navigate("/login");
-  };
+  // Always call useEffect
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, [isLoggedIn]);
+
+  // Conditionally render navbar
+  if (location.pathname.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <nav className="navbar">
       <h1 className="logo">Boat Safari</h1>
       <div className="nav-links">
         <Link to="/">Home</Link>
+        <Link to="/booktrip">Book Trip</Link>
+        <Link to="/feedback">Feedback</Link>
 
-        {/* Show links only if logged in */}
-        {isLoggedIn && (
-          <>
-            <Link to="/booktrip">Book Trip</Link>
-            <Link to="/feedback">Feedback</Link>
-
-            {/* Show Report link only if user is admin */}
-            {user?.role === "admin" && <Link to="/report">Reports</Link>}
-          </>
-        )}
-
-        {/* Show login if not logged in */}
         {!isLoggedIn ? (
           <Link to="/login">Login</Link>
         ) : (
-          <button className="logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          <>
+            {/* Show Admin Panel link if user is admin */}
+            {user?.role === "ADMIN" && <Link to="/admin">Admin Panel</Link>}
+          </>
         )}
       </div>
     </nav>

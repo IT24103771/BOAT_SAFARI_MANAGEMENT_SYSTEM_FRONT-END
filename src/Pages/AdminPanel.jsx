@@ -24,6 +24,59 @@ const AdminPanel = () => {
     boatId: "",
     tripId: "",
   });
+   // --- User Form ---
+   const [userForm, setUserForm] = useState({
+    id: null,
+    name: "",
+    email: "",
+    password: "",
+    role: "USER"
+  });
+
+  // Handle user form change
+  const handleUserChange = (e) => {
+    setUserForm({ ...userForm, [e.target.name]: e.target.value });
+  };
+
+  // Save User
+  const handleSaveUser = () => {
+    const payload = {
+      name: userForm.name,
+      email: userForm.email,
+      password: userForm.password,
+      role: userForm.role
+    };
+
+    const apiCall = userForm.id
+      ? axios.put(`http://localhost:8080/api/users/${userForm.id}`, payload)
+      : axios.post("http://localhost:8080/api/users/register", payload);
+
+    apiCall
+      .then(() => {
+        setUserForm({ id: null, name: "", email: "", password: "", role: "USER" });
+        fetchDashboard();
+      })
+      .catch(console.error);
+  };
+
+  // Edit User
+  const handleEditUser = (user) => {
+    setUserForm({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      password: "",
+      role: user.role
+    });
+  };
+
+  // Delete User
+  const handleDeleteUser = (id) => {
+    axios
+      .delete(`http://localhost:8080/api/users/${id}`)
+      .then(fetchDashboard)
+      .catch(console.error);
+  };
 
   // --- Boat Form ---
   const [boatForm, setBoatForm] = useState({
@@ -432,23 +485,74 @@ const AdminPanel = () => {
         </section>
       )}
 
-      {/* ✅ USERS */}
-      {activeTab === "users" && (
+     {/* Users */}
+     {activeTab === "users" && (
         <section>
           <h2>Users</h2>
+
+          {/* User List Table */}
           {users.length === 0 ? (
-            <p>No users</p>
+            <p>No users found.</p>
           ) : (
-            <ul>
-              {users.map((u) => (
-                <li key={u.id}>
-                  {u.name} | {u.email}
-                </li>
-              ))}
-            </ul>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u.id}>
+                    <td>{u.id}</td>
+                    <td>{u.name}</td>
+                    <td>{u.email}</td>
+                    <td>{u.role}</td>
+                    <td>
+                      <button onClick={() => handleEditUser(u)}>Edit</button>
+                      <button onClick={() => handleDeleteUser(u.id)}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
+
+          {/* User Form */}
+          <div className="user-form">
+            <h3>{userForm.id ? "Update User" : "Add User"}</h3>
+            <input
+              name="name"
+              value={userForm.name}
+              onChange={handleUserChange}
+              placeholder="User Name"
+            />
+            <input
+              name="email"
+              value={userForm.email}
+              onChange={handleUserChange}
+              placeholder="Email"
+            />
+            <input
+              name="password"
+              value={userForm.password}
+              onChange={handleUserChange}
+              placeholder="Password"
+            />
+            <select name="role" value={userForm.role} onChange={handleUserChange}>
+              <option value="USER">USER</option>
+              <option value="ADMIN">ADMIN</option>
+            </select>
+            <button onClick={handleSaveUser}>
+              {userForm.id ? "Update User" : "Add User"}
+            </button>
+          </div>
         </section>
       )}
+
 
       {/* ✅ BOATS */}
       {activeTab === "boats" && (

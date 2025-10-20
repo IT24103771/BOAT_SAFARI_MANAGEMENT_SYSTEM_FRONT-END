@@ -1,55 +1,121 @@
-.invoice-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
 .invoice-container {
-  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 30px;
-  border-radius: 10px;
-  width: 400px;
-  max-width: 90%;
-  text-align: left;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  min-height: 100vh;
 }
 
-.invoice-content h1 {
+.invoice-box {
+  position: relative; /* Required for absolute positioning of close button */
+  width: 700px;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 30px 40px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.close-btn-top {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #c0392b;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 32px;
   text-align: center;
-  margin-bottom: 20px;
+  transition: background 0.3s ease;
 }
 
-.invoice-content p {
-  margin: 8px 0;
+.close-btn-top:hover {
+  background-color: #922b21;
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.invoice-title {
+  font-size: 28px;
+  color: #2c3e50;
+}
+
+.invoice-date {
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 20px 0;
+}
+
+.invoice-section h2 {
+  font-size: 18px;
+  color: #34495e;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ecf0f1;
+  padding-bottom: 5px;
+}
+
+.invoice-section p {
+  font-size: 14px;
+  margin: 5px 0;
+  color: #2c3e50;
+}
+
+.invoice-footer {
+  text-align: center;
+  font-weight: bold;
+  color: #27ae60;
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+.invoice-footer .highlight {
+  color: #2980b9;
 }
 
 .invoice-actions {
   display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+  flex-wrap: wrap;
 }
 
-.download-btn,
-.close-btn {
-  padding: 10px 15px;
+.action-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 8px;
   border: none;
-  border-radius: 5px;
   cursor: pointer;
+  background-color: #2980b9;
+  color: #fff;
+  transition: background 0.3s ease;
 }
 
-.download-btn {
-  background-color: #4CAF50;
-  color: white;
+.action-btn:hover {
+  background-color: #1c5980;
 }
 
-.close-btn {
-  background-color: #f44336;
-  color: white;
+.loading-text,
+.error-text {
+  text-align: center;
+  color: #c0392b;
+  margin-top: 20px;
+  font-size: 16px;
 }
