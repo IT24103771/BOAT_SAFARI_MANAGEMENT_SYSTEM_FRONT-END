@@ -12,6 +12,78 @@ const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("bookings");
   const navigate = useNavigate();
 
+  // --- at the top, add state for feedbacks ---
+const [feedbacks, setFeedbacks] = useState([]);
+const [feedbackForm, setFeedbackForm] = useState({
+  id: null,
+  name: "",
+  userEmail: "",
+  message: "",
+  rating: 5,
+});
+
+// --- Fetch feedbacks along with dashboard ---
+const fetchFeedbacks = () => {
+  axios
+    .get("http://localhost:8080/api/feedbacks")
+    .then((res) => setFeedbacks(res.data))
+    .catch(console.error);
+};
+
+// --- useEffect ---
+useEffect(() => {
+  fetchDashboard();
+  fetchTrips();
+  fetchFeedbacks();
+}, []);
+
+// --- Feedback Handlers ---
+const handleFeedbackChange = (e) => {
+  setFeedbackForm({ ...feedbackForm, [e.target.name]: e.target.value });
+};
+
+const handleSaveFeedback = () => {
+  if (!feedbackForm.name || feedbackForm.name.trim().length < 3) return alert("Name must be at least 3 chars");
+  if (!feedbackForm.message || feedbackForm.message.trim().length < 10) return alert("Message must be at least 10 chars");
+
+  const payload = {
+    name: feedbackForm.name,
+    message: feedbackForm.message,
+    rating: parseInt(feedbackForm.rating),
+    userEmail: feedbackForm.userEmail || "", // optional
+  };
+
+  const apiCall = feedbackForm.id
+    ? axios.put(`http://localhost:8080/api/feedbacks/${feedbackForm.id}`, payload)
+    : axios.post("http://localhost:8080/api/feedbacks", payload);
+
+  apiCall
+    .then(() => {
+      setFeedbackForm({ id: null, name: "", message: "", rating: 5, userEmail: "" });
+      fetchFeedbacks();
+    })
+    .catch(console.error);
+};
+
+const handleEditFeedback = (f) => {
+  setFeedbackForm({
+    id: f.id,
+    name: f.name,
+    message: f.message,
+    rating: f.rating,
+    userEmail: f.userEmail,
+  });
+};
+
+const handleDeleteFeedback = (id) => {
+  if (!window.confirm("Are you sure you want to delete this feedback?")) return;
+  axios
+    .delete(`http://localhost:8080/api/feedbacks/${id}`)
+    .then(fetchFeedbacks)
+    .catch(console.error);
+};
+
+
   // --- Booking Form ---
   const [bookingForm, setBookingForm] = useState({
     id: null,
@@ -329,11 +401,16 @@ const AdminPanel = () => {
     <div className="admin-container">
       <h1>Admin Panel</h1>
       <div className="admin-tabs">
-        {["bookings", "users", "boats", "trips"].map((tab) => (
-          <button key={tab} onClick={() => setActiveTab(tab)}>
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
-        ))}
+      {["bookings", "users", "boats", "trips", "feedbacks"].map((tab) => (
+  <button
+    key={tab}
+    className={activeTab === tab ? "active-tab" : ""}
+    onClick={() => setActiveTab(tab)}
+  >
+    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+  </button>
+))}
+
       </div>
 
       {/* ✅ BOOKINGS */}
@@ -627,6 +704,72 @@ const AdminPanel = () => {
           </table>
         </section>
       )}
+      {/* ✅ FEEDBACKS */}
+{activeTab === "feedbacks" && (
+  <section>
+    <h2>Feedbacks</h2>
+
+    {/* Feedback Form */}
+    {/* <div className="feedback-form-admin"> */}
+      {/* <h3>{feedbackForm.id ? "Edit Feedback" : "Add Feedback"}</h3> */}
+      {/* <input
+        name="name"
+        value={feedbackForm.name}
+        onChange={handleFeedbackChange}
+        placeholder="Name"
+        required
+      /> */}
+      {/* <textarea
+        name="message"
+        value={feedbackForm.message}
+        onChange={handleFeedbackChange}
+        placeholder="Feedback message"
+        rows="3"
+      /> */}
+      {/* <select name="rating" value={feedbackForm.rating} onChange={handleFeedbackChange}>
+        <option value={1}>⭐</option>
+        <option value={2}>⭐⭐</option>
+        <option value={3}>⭐⭐⭐</option>
+        <option value={4}>⭐⭐⭐⭐</option>
+        <option value={5}>⭐⭐⭐⭐⭐</option>
+      </select> */}
+      {/* <button onClick={handleSaveFeedback}>{feedbackForm.id ? "Update" : "Add"}</button> */}
+    {/* </div> */}
+
+    {/* Feedback Table */}
+    {feedbacks.length === 0 ? (
+      <p>No feedbacks available.</p>
+    ) : (
+      <table className="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Message</th>
+            <th>Rating</th>
+            <th>User Email</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {feedbacks.map((f) => (
+            <tr key={f.id}>
+              <td>{f.id}</td>
+              <td>{f.name}</td>
+              <td>{f.message}</td>
+              <td>{f.rating}</td>
+              <td>{f.email}</td>
+              <td>
+                <button onClick={() => handleDeleteFeedback(f.id)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </section>
+)}
+
 
       {/* ✅ TRIPS */}
       {activeTab === "trips" && (

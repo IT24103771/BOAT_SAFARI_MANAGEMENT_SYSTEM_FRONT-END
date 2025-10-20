@@ -11,17 +11,16 @@ function Login({ setIsLoggedIn }) {
   // 🔹 Redirect if already logged in
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-    const user = JSON.parse(localStorage.getItem("user"));
-
-    if (isLoggedIn && user) {
-      if (user.role === "ADMIN") {
+    if (isLoggedIn) {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user?.role === "ADMIN") {
         navigate("/admin");
       } else {
-        navigate("/booktrip");
+        navigate("/");
       }
     }
-  }, [navigate]);
-
+  }, []); // ✅ Remove "navigate" from dependency
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
